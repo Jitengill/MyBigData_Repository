@@ -1,0 +1,43 @@
+
+# This is working with normal piggybank.jar
+
+
+# Register piggybank.jar file 
+
+REGISTER /home/training/piggybank.jar
+
+# Load the document using XMLLoader() into a char array. Specify the parent tag to be extracted. 
+# If all the elements are defined under root_element without a parent tag, then the root element will 
+ # be loaded using the XMLLoader()
+
+xmldata = load '/my_input3/food_data.xml' USING org.apache.pig.piggybank.storage.XMLLoader('food') as(doc:chararray);
+
+# Try dumping it 
+dump xmldata;
+
+
+
+# This reading was using regular expression
+
+food_content_flat = FOREACH  xmldata GENERATE FLATTEN(REGEX_EXTRACT_ALL(doc,'<food>\\s*<name>(.*)</name>\\s*<price>(.*)</price>\\s*<description>(.*)</description>\\s*<calories>(.*)</calories>\\s*</food>'));
+
+
+======================================================================================================================
+======================================================================================================================
+
+
+# This belowcode is working with piggybank-0.17.0.jar and that too on better version of pig and java 8.
+# Same should be the case with piggybank-0.15.0.jar  
+
+# By XPath
+
+REGISTER /home/training/piggybank-0.15.0.jar
+
+DEFINE XPath org.apache.pig.piggybank.evaluation.xml.XPath();
+
+xmldata = load '/my_input3/food_data.xml' USING org.apache.pig.piggybank.storage.XMLLoader('food') as(doc:chararray);
+
+dump xmldata;
+
+
+food_content_xpath = FOREACH xmldata GENERATE XPath(doc,'food/name'),XPath(doc,'food/price'),XPath(doc,'food/description'),XPath(doc,'food/calories');
